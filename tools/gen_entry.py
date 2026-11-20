@@ -496,13 +496,15 @@ REGIONS = [
 FEATURED = [
     dict(n=1, illus=illus_cyclone, tag="ODISHA · CYCLONE", tagc=RED,
          head="CYCLONE AKVAN COMES ASHORE IN INDIA",
-         deck="It crossed the Andhra–Odisha coast near Gopalpur, 7:30–8:30 am IST. Winds 70–80 kmph, gusting 90; 3.72 lakh evacuated; Patrapur 209 mm. No major death toll reported at midday.",
-         source="IMD / THE STATESMAN / INDIA TODAY", kind="lead"),
+         deck="Landfall near Gopalpur 7:30–8:30 am IST; winds 70–80 kmph, gusting 90; 3.72 lakh evacuated; Patrapur 209 mm. No major death toll reported at midday.",
+         source="IMD / STATESMAN / INDIA TODAY", kind="lead"),
     dict(n=2, illus=illus_kyiv, tag="KYIV · WAR", tagc=RED,
          head="RUSSIAN MISSILE BARRAGE HITS KYIV",
+         deck="About 30 missiles hit energy and transport sites; embassies damaged. Injuries reported in the repeat barrage after the Shenzhen talks.",
          source="REUTERS / KYIV CITY", kind="med"),
     dict(n=3, illus=illus_cop, tag="ANTALYA · CLIMATE", tagc=GREEN,
          head="COP31 REACHES FINAL DAY DEADLOCKED",
+         deck="Final day in Antalya: the draft drops fossil-fuel language and a $120bn finance gap is unresolved. Overtime looks likely.",
          source="GUARDIAN / REUTERS", kind="med"),
     dict(n=4, illus=illus_markets, tag="TOKYO · MARKETS", tagc=RED,
          head="AI SELL-OFF SINKS ASIAN SHARES",
@@ -552,7 +554,7 @@ BRIEFS = [
     ("AUKUS sales could shrink US submarine fleet", "REUTERS"),
     ("Trial pill shrinks pancreatic tumours", "REUTERS"),
     ("Tonga and Fiji declare drought emergencies", "RNZ / AP"),
-    ("BepiColombo to enter Mercury orbit next", "ESA"),
+    ("China holds one-year LPR at 3.0%", "REUTERS"),
     ("Korea, Taiwan shares slip in chip sell-off", "REUTERS"),
 ]
 
@@ -590,7 +592,7 @@ text(d, (M + fw + 16, 60), "20 NOVEMBER 2026", mf, INK)
 text(d, (M, 143),
      "The world in one day — Cyclone Akvan ashore in India · Russian missiles hit Kyiv · COP31’s final day · Asia’s AI sell-off",
      F(SERIF_IT, 12.2), INK)
-text(d, (W - M, 144), "38 STORIES · 6 CONTINENTS", F(BC_SB, 7.4), MUTED, anchor="ra")
+text(d, (W - M, 144), "37 STORIES · 6 CONTINENTS", F(BC_SB, 7.4), MUTED, anchor="ra")
 rule(d, M, 162, W - M, 162, 2, RED)
 
 # stat rail
@@ -612,63 +614,41 @@ for label, frac, col in REGIONS:
     text(d, (rx + 6, 217.3), label, F(BC_SB, 6.2), CREAM)
     rx += rw
 
-# ------------------------------------------------------------- lead hero
-LY0, LY1 = 230, 398
-LX0, LXSPLIT, LX1 = M, 592, W - M
-feat = FEATURED[0]
-feat["illus"](d, LX0, LY0, LXSPLIT - LX0, LY1 - LY0)
-d.rectangle([LXSPLIT, LY0, LX1, LY1], outline=FAINT, width=1)
-tx = LXSPLIT + 12
-tw = LX1 - tx - 12
-text(d, (tx, LY0 + 6), f"{feat['n']:02d}  ·  LEAD  ·  {feat['tag']}", F(BC_B, 8.4), RED)
-hy = LY0 + 22
-for line in ("AKVAN MAKES LANDFALL", "NEAR GOPALPUR"):
-    text(d, (tx, hy), line, F(BC_XB, 28), INK)
-    hy += 30
-hy += 2
-hy, _ = draw_para(d, feat["deck"], F(SERIF, 10.6), tx, hy, tw, 12.6, INK,
-                  justify=True, max_lines=3)
-# lead numbers
-nums = [("3.72 LAKH", "evacuated"), ("70–80", "kmph, gust 90"),
-        ("209 MM", "Patrapur / 24h"), ("423", "rescue teams")]
-nw = tw / 4
-ny = LY1 - 40
-rule(d, tx, ny - 5, LX1 - 12, ny - 5, 1, INK)
-for i, (b, s) in enumerate(nums):
-    nx = tx + i * nw
-    text(d, (nx, ny), b, F(BC_XB, 14), INK)
-    text(d, (nx, ny + 17), s, F(SERIF, 6.6), MUTED)
+# ------------------------------------------------------------- three leads
+LEAD_Y0, LEAD_Y1 = 230, 430
+lgap = 12
+lw = (CW - 2 * lgap) // 3
+lead_img_h = 104
+for i, feat in enumerate(FEATURED[:3]):
+    lx = M + i * (lw + lgap)
+    d.rectangle([lx, LEAD_Y0, lx + lw, LEAD_Y1], outline=FAINT, width=1)
+    feat["illus"](d, lx + 1, LEAD_Y0 + 1, lw - 2, lead_img_h)
+    by = LEAD_Y0 + lead_img_h + 4
+    badge(d, lx + 15, by + 9, feat["n"])
+    tag(d, lx + 30, by + 4, feat["tag"], fill=feat["tagc"], size=6.0)
+    text(d, (lx + lw - 9, by + 6), feat["source"], F(BC_SB, 5.2), MUTED, anchor="ra")
+    hy, _ = draw_para(d, feat["head"], F(BC_B, 15.0), lx + 10, by + 18,
+                      lw - 20, 15.5, INK, max_lines=2)
+    if feat.get("deck"):
+        hy, _ = draw_para(d, feat["deck"], F(SERIF, 8.6), lx + 10, hy + 2,
+                          lw - 20, 10.4, INK, max_lines=3)
 
-# ------------------------------------------------------------- medium cards
-card_y0, card_y1 = 404, 570
-cw = (CW - 22) // 3
-for i, feat in enumerate(FEATURED[1:4]):
-    cx = M + i * (cw + 11)
-    d.rectangle([cx, card_y0, cx + cw, card_y1], outline=FAINT, width=1)
-    feat["illus"](d, cx + 1, card_y0 + 1, int(cw) - 1, 108)
-    by = card_y0 + 112
-    badge(d, cx + 14, by + 8, feat["n"])
-    tag(d, cx + 28, by + 3, feat["tag"], fill=feat["tagc"], size=5.8)
-    hy, _ = draw_para(d, feat["head"], F(BC_B, 14), cx + 10, by + 16,
-                      cw - 20, 14.5, INK, max_lines=2)
-    text(d, (cx + 10, card_y1 - 12), feat["source"], F(BC_SB, 5.8), MUTED)
-
-# ------------------------------------------------------------- small cards
-row_y = [576, 650]
-sh = 68
-sw = (CW - 32) // 5
-for k, feat in enumerate(FEATURED[4:]):
-    r, c = divmod(k, 5)
-    sx = M + c * (sw + 8)
-    sy = row_y[r]
-    d.rectangle([sx, sy, sx + sw, sy + sh], outline=FAINT, width=1)
-    feat["illus"](d, sx + 1, sy + 1, 70, sh - 1)
-    bx = sx + 78
-    tag(d, bx, sy + 5, feat["tag"], fill=feat["tagc"], size=5.2)
-    hy, _ = draw_para(d, feat["head"], F(BC_B, 9.3), bx, sy + 18,
-                      sw - 84, 10.6, INK, max_lines=3)
-    text(d, (bx, sy + sh - 11), f"{feat['n']:02d}  {fit(feat['source'], F(BC_SB, 5.2), sw - 84)}",
-         F(BC_SB, 5.2), MUTED)
+# ------------------------------------------------------------- compact card grid
+GX0, GY0 = M, 436
+gcols, ggap, gh = 5, 8, 136
+gw = (CW - (gcols - 1) * ggap) // gcols
+for k, feat in enumerate(FEATURED[3:13]):
+    r, c = divmod(k, gcols)
+    gx = GX0 + c * (gw + ggap)
+    gy = GY0 + r * (gh + ggap)
+    d.rectangle([gx, gy, gx + gw, gy + gh], outline=FAINT, width=1)
+    feat["illus"](d, gx + 1, gy + 1, gw - 2, 76)
+    tag(d, gx + 7, gy + 79, feat["tag"], fill=feat["tagc"], size=5.0)
+    hy, _ = draw_para(d, feat["head"], F(BC_B, 9.6), gx + 7, gy + 91,
+                      gw - 14, 11, INK, max_lines=3)
+    text(d, (gx + 7, gy + gh - 11),
+         f"{feat['n']:02d}  {fit(feat['source'], F(BC_SB, 5.0), gw - 22)}",
+         F(BC_SB, 5.0), MUTED)
 
 # ------------------------------------------------------------- section head
 rule(d, M, 726, W - M, 726, 1, INK)
@@ -679,15 +659,16 @@ text(d, (W - M, 731), "ALSO ON FRIDAY 20 NOVEMBER — 24 MORE STORIES",
 # ------------------------------------------------------------- map
 MX0, MY0, MX1, MY1 = M, 744, 340, 884
 d.rectangle([MX0, MY0, MX1, MY1], fill=PETROL)
-# stylised continents
-d.polygon([(58, 18), (96, 12), (118, 26), (108, 46), (86, 50), (80, 68),
-           (58, 64), (46, 42)], fill=PETROL2)
-d.polygon([(118, 60), (142, 58), (148, 92), (130, 116), (118, 96)], fill=PETROL2)
-d.polygon([(150, 16), (240, 14), (268, 30), (250, 52), (214, 48), (196, 66),
-           (170, 58), (156, 40)], fill=PETROL2)
-d.polygon([(206, 70), (240, 66), (252, 90), (230, 108), (214, 92)], fill=PETROL2)
-d.polygon([(270, 56), (312, 60), (318, 92), (288, 104), (270, 86)], fill=PETROL2)
-d.polygon([(270, 104), (296, 108), (294, 124), (276, 122)], fill=PETROL2)
+# stylised continents (kept inside the map frame, never over the masthead)
+for pts in [
+    [(58, 18), (96, 12), (118, 26), (108, 46), (86, 50), (80, 68), (58, 64), (46, 42)],
+    [(118, 60), (142, 58), (148, 92), (130, 116), (118, 96)],
+    [(150, 16), (240, 14), (268, 30), (250, 52), (214, 48), (196, 66), (170, 58), (156, 40)],
+    [(206, 70), (240, 66), (252, 90), (230, 108), (214, 92)],
+    [(270, 56), (312, 60), (318, 92), (288, 104), (270, 86)],
+    [(270, 104), (296, 108), (294, 124), (276, 122)],
+]:
+    d.polygon([(MX0 + px, MY0 + py) for px, py in pts], fill=PETROL2)
 pins = [(76, 34, 2), (132, 82, 6), (168, 38, 8), (196, 54, 3), (226, 30, 4),
         (244, 46, 13), (286, 74, 11), (296, 70, 5), (120, 44, 1), (224, 92, 7),
         (290, 116, 12), (158, 100, 9)]
