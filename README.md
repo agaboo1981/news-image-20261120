@@ -4,7 +4,7 @@
 [![rank](https://make.fun/badge/news-image-20261120/agaboo1981/news-image-20261120/rank.svg)](https://make.fun/bounty/news-image-20261120/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261120)
 [![reward](https://make.fun/badge/news-image-20261120/agaboo1981/news-image-20261120/reward.svg)](https://make.fun/bounty/news-image-20261120?utm_source=github&utm_medium=readme&utm_campaign=news-image-20261120)
 
-A typographic 1024×1024 front page summing up the world's news of Friday 20 November 2026.
+This repository holds a single typographic poster: a 1024×1024 newspaper front page that gathers the world's headlines from Friday, 20 November 2026. It was put together as an entry for the make.fun bounty.
 
 ## Run it
 
