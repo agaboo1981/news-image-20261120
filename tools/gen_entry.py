@@ -2,7 +2,7 @@
 """Rebuild The Meridian's Friday 20 November 2026 world-news front page.
 
 Offline, deterministic, local fonts only, 1024x1024 PNG.
-Typographic-first: the date, six figures, three leads and five banners are
+Typographic-first: the date, six figures, three leads and eight banner cards are
 drawn large enough to survive a reduction to roughly 300 pixels across.
 Illustrations are simple original diagrams, secondary to the type.
 """
@@ -26,6 +26,7 @@ MUTED = (103, 96, 84)
 FAINT = (206, 199, 184)
 TINT = (231, 223, 207)
 AMBER = (213, 139, 48)
+OCHRE = (122, 82, 24)
 GREEN = (32, 92, 75)
 WHITE = (250, 247, 239)
 
@@ -137,7 +138,7 @@ def tag(d, x, y, label, fill=RED, size=10.0):
     return wd
 
 
-def banner_font(s, maxw, hi=25, lo=19):
+def banner_font(s, maxw, hi=28, lo=22):
     for sz in range(hi, lo - 1, -1):
         f = F(DISPLAY, sz)
         if f.getlength(s) <= maxw:
@@ -221,25 +222,27 @@ def diag_markets(d, x, y, w, h):
 
 
 def draw_map(d, x, y, w, h):
+    sx, sy = w / 268.0, h / 188.0
     d.rectangle([x, y, x + w, y + h], fill=PETROL)
     shapes = [
         [(22, 24), (64, 16), (86, 32), (76, 56), (54, 60), (48, 84), (26, 78), (14, 50)],
         [(86, 74), (108, 72), (114, 114), (96, 134), (84, 108)],
         [(120, 20), (218, 16), (246, 34), (228, 60), (192, 56), (174, 76), (148, 68), (132, 46)],
         [(178, 86), (214, 82), (226, 112), (204, 130), (188, 110)],
-        [(232, 68), (272, 72), (278, 108), (248, 120), (232, 100)],
+        [(232, 68), (262, 72), (266, 108), (248, 120), (232, 100)],
     ]
     for pts in shapes:
-        d.polygon([(x + px, y + py) for px, py in pts], fill=PETROL2)
-    pins = [(40, 42, 1), (96, 100, 2), (150, 44, 3), (196, 62, 4),
-            (250, 92, 5), (206, 108, 6), (120, 122, 7), (258, 78, 8)]
-    for px, py, _ in pins:
-        ax, ay = x + px, y + py
-        d.ellipse([ax - 7, ay - 7, ax + 7, ay + 7], fill=RED, outline=WHITE, width=2)
+        d.polygon([(x + px * sx, y + py * sy) for px, py in pts], fill=PETROL2)
+    pins = [(40, 42), (96, 100), (150, 44), (196, 62),
+            (250, 92), (206, 108), (120, 122), (258, 78)]
+    r = max(4, 7 * min(sx, sy))
+    for px, py in pins:
+        ax, ay = x + px * sx, y + py * sy
+        d.ellipse([ax - r, ay - r, ax + r, ay + r], fill=RED, outline=WHITE, width=2)
         d.ellipse([ax - 2, ay - 2, ax + 2, ay + 2], fill=WHITE)
-    text(d, (x + 10, y + 10), "WHERE IT HAPPENED", F(SMALL, 11), WHITE)
-    text(d, (x + 10, y + h - 18), "PINS: KYIV \u00b7 ODISHA \u00b7 TOKYO \u00b7 ANTALYA", F(MICRO, 9), (176, 196, 190))
-    text(d, (x + 10, y + h - 8), "TBILISI \u00b7 SENEGAL \u00b7 BRAZIL \u00b7 FIJI", F(MICRO, 9), (176, 196, 190))
+    text(d, (x + 8, y + 8), "WHERE IT HAPPENED", F(SMALL, 12), WHITE)
+    text(d, (x + 8, y + h - 36), "KYIV \u00b7 ODISHA \u00b7 TOKYO \u00b7 ANTALYA", F(MICRO, 11), (176, 196, 190))
+    text(d, (x + 8, y + h - 20), "TBILISI \u00b7 POLAND \u00b7 GAZA \u00b7 KENYA", F(MICRO, 11), (176, 196, 190))
 
 
 # ------------------------------------------------------------------ content
@@ -274,8 +277,8 @@ LEADS = [
 ]
 
 BANNERS = [
-    dict(banner="COP31: DEADLOCK", fill=GREEN,
-         head="Antalya's final day stalls; draft drops fossil-fuel text, $120bn finance gap open.",
+    dict(banner="COP31: STILL TALKING", fill=GREEN,
+         head="Antalya final day; talks on. Draft drops fossil-fuel text; $120bn gap open.",
          source="GUARDIAN / REUTERS", region="MID-EAST"),
     dict(banner="DEBT NEARS 100%", fill=RED,
          head="IMF's Georgieva: global public debt closing in on 100% of world GDP.",
@@ -289,45 +292,54 @@ BANNERS = [
     dict(banner="EU\u2013UK RESET", fill=PETROL2,
          head="Burnham opens the first EU\u2013UK reset summit; no deal announced.",
          source="EU COUNCIL / AFP", region="EUROPE"),
+    dict(banner="POLAND MISSILES LAND", fill=RED,
+          head="Two Russian missiles and a suspected drone land in Poland; Tusk: provocation; Rutte: grave violation.",
+          source="AP / REUTERS", region="EUROPE"),
+    dict(banner="GAZA: SIX KILLED", fill=RED_D,
+         head="Friday strikes kill six, officials say; Israel said it hit militants.",
+         source="AP", region="MID-EAST"),
+    dict(banner="GOLD, SILVER SLUMP", fill=OCHRE,
+         head="Precious metals slide more than 4% as risk appetite fades.",
+         source="CNBC-TV18", region="ASIA"),
 ]
 
 MORE = [
-    ("Japan CPI holds at 2.3%", "REUTERS", "ASIA"),
+    ("Japan CPI holds 2.3%", "REUTERS", "ASIA"),
     ("China holds LPR at 3.0%", "REUTERS", "ASIA"),
-    ("BepiColombo at Mercury", "ESA", "GLOBAL"),
-    ("CGIL strike hits Italy", "CGIL / AFP", "EUROPE"),
-    ("Senegal migrant boat", "AL JAZEERA", "AFRICA"),
-    ("Lula meets Raoni", "AL JAZEERA", "AMERICAS"),
-    ("Panguna mine pledge", "REUTERS", "OCEANIA"),
-    ("Bukele seeks term three", "AP", "AMERICAS"),
-    ("Kenya oil well strikes", "REUTERS", "AFRICA"),
-    ("UN marks Children's Day", "UN", "GLOBAL"),
+    ("CGIL strike hits Italy", "REUTERS", "EUROPE"),
     ("UK, Norway fund Kyiv", "BBC", "EUROPE"),
+    ("Denmark backs Greenland", "AFP", "EUROPE"),
+    ("Panguna mine pledge", "REUTERS", "OCEANIA"),
+    ("Kenya oil well strikes", "REUTERS", "AFRICA"),
+    ("Lula meets Raoni", "AL JAZEERA", "AMERICAS"),
+    ("Bepi flyby; orbit Sat", "ESA", "GLOBAL"),
     ("Seoul court clears ex-PM", "SBS", "ASIA"),
     ("Taiwan curbs shorts", "REUTERS", "ASIA"),
     ("Indonesia forfeiture bill", "REUTERS", "ASIA"),
     ("Israel strikes Hezbollah", "AP", "MID-EAST"),
-    ("Mexico Revolution Day", "AP", "AMERICAS"),
-    ("Tonga, Fiji drought", "RNZ / AP", "OCEANIA"),
-    ("Pancreatic pill trial", "REUTERS", "GLOBAL"),
-    ("Fed minutes: tightening", "REUTERS", "AMERICAS"),
-    ("Denmark backs Greenland bill", "AFP", "EUROPE"),
+    ("Trump rejects Iran terms", "AP", "MID-EAST"),
+    ("Saudi hits Houthi arms", "AP", "MID-EAST"),
+    ("Houthi fire on Saudi", "AP", "MID-EAST"),
     ("South Africa wins Test", "ICC", "AFRICA"),
-    ("Phillips 118 v India", "ICC", "OCEANIA"),
-    ("Gold, silver slump 4%+", "CNBC-TV18", "ASIA"),
+    ("Mexico Revolution Day", "AP", "AMERICAS"),
+    ("Fed minutes: tightening", "REUTERS", "AMERICAS"),
+    ("UN Children's Day", "UN", "GLOBAL"),
     ("UN succession talks stall", "REUTERS", "GLOBAL"),
+    ("Pancreatic pill trial", "REUTERS", "GLOBAL"),
+    ("Phillips 118 v India", "ICC", "OCEANIA"),
 ]
 
 DATE_CHECK = (
-    "EXCLUDED AS THURSDAY 19 NOVEMBER NEWS, NOT SOLD AS FRIDAY'S: the Trump\u2013Xi\u2013Putin Shenzhen "
-    "summit and its four-point declaration; the ICJ Myanmar/Rohingya judgment; the Houthi strike on "
-    "Riyadh's tallest tower; GTA VI launch-night sales; Anthropic's Nasdaq debut; the Van Gogh sale; "
-    "the US Senate Iran war-powers vote; and Trump's Iran-strike delay."
+    "NOT FRIDAY'S NEWS (EXCLUDED): Shenzhen Trump\u2013Xi\u2013Putin summit; ICJ Myanmar/Rohingya ruling; "
+    "Houthi strike on Riyadh tower; US Senate Iran war powers; Trump Iran-strike delay; GTA VI sales; "
+    "Anthropic debut; Van Gogh sale. Tonga's 27-day emergency was announced Thursday 19 Nov in "
+    "Nuku'alofa (RNZ); Fiji's disaster was declared Wednesday 18 Nov (RNZ); the Senegal boat sank "
+    "Wednesday off Yenne and officials told AP Thursday. Friday's RNZ Pacific Waves only recapped those emergencies."
 )
 
 SOURCES = (
-    "Sources on each story. IMD; The Statesman; India Today; Reuters; AP; AFP; BBC; The Guardian; "
-    "SCMP; Al Jazeera; ICC; ESA; UN; IMF; IEA; EU Council; RNZ; SBS. "
+    "Sources on each story. IMD; The Statesman; India Today; Reuters; AP; AFP; BBC; Guardian; "
+    "SCMP; Al Jazeera; ICC; ESA; UN; IMF; IEA; RNZ; SBS; CNBC-TV18; EU Council. "
     "Times and bulletins differ; COP31 was still in session at Friday's close. Figures are as first reported."
 )
 
@@ -355,7 +367,7 @@ text(d, (M + fw + 10, 60), "20 NOVEMBER 2026", date_font, INK)
 
 # one-line deck
 text(d, (M, 156),
-     "Russia's barrage kills eight in Ukraine \u00b7 Cyclone Akvan ashore in India \u00b7 Asian markets slide \u00b7 COP31 ends deadlocked",
+     "Russia's barrage kills eight in Ukraine \u00b7 Cyclone Akvan ashore in India \u00b7 Asian markets slide \u00b7 COP31 talks still open",
      F(SERIF, 18), INK)
 rule(d, M, 184, W - M, 184, 2, RED)
 
@@ -388,7 +400,7 @@ for label, n, col in bar:
 
 # three leads
 text(d, (M, 287), "THE DAY'S THREE LEADS", F(HEADB, 12), RED)
-text(d, (W - M, 288), f"{len(LEADS) + len(BANNERS) + len(MORE)} STORIES \u00b7 {len(REGIONS)} REGIONS \u00b7 ORIGINAL DIAGRAMS", F(SMALL, 11), MUTED, anchor="rt")
+text(d, (W - M, 288), f"{len(LEADS) + len(BANNERS) + len(MORE)} STORIES \u00b7 {len(REGIONS)} REGIONS \u00b7 ORIGINAL DIAGRAMS", F(SMALL, 12), MUTED, anchor="rt")
 
 lgap = 12
 lw = (CW - 2 * lgap) / 3
@@ -396,55 +408,63 @@ for i, feat in enumerate(LEADS):
     lx = M + i * (lw + lgap)
     d.rectangle([lx, 306, lx + lw, 500], outline=FAINT, width=1)
     feat["diagram"](d, int(lx) + 1, 307, int(lw) - 2, 60)
-    tw = tag(d, int(lx) + 8, 371, feat["tag"], fill=feat["tagc"], size=10)
-    text(d, (lx + lw - 8, 373), feat["source"], F(MICRO, 9), MUTED, anchor="rt")
+    tw = tag(d, int(lx) + 8, 371, feat["tag"], fill=feat["tagc"], size=12)
+    text(d, (lx + lw - 8, 372), feat["source"], F(MICRO, 12), MUTED, anchor="rt")
     for j, line in enumerate(feat["head"].split("\n")):
         text(d, (lx + 8, 390 + j * 31), line, F(HEADB, 30), INK)
     para(d, feat["deck"], F(SANS, 13), lx + 8, 456, lw - 16, 15, INK, max_lines=3)
 
-# five banner cards
-text(d, (M, 508), "FIVE MORE FRONT-PAGE STORIES", F(HEADB, 12), RED)
+# eight banner cards, two rows of four
+text(d, (M, 503), "EIGHT MORE FRONT-PAGE STORIES", F(HEADB, 12), RED)
 bgap = 8
-bw = (CW - 4 * bgap) / 5
+bw = (CW - 3 * bgap) / 4
 for i, card in enumerate(BANNERS):
-    bx = M + i * (bw + bgap)
-    d.rectangle([bx, 527, bx + bw, 642], outline=FAINT, width=1)
-    d.rectangle([bx + 1, 528, bx + bw - 1, 561], fill=card["fill"])
+    row, col = divmod(i, 4)
+    by0 = 520 + row * 84
+    bx = M + col * (bw + bgap)
+    bodyf = F(SANS, 13)
+    tight = len(wrap(card["head"], bodyf, bw - 14)) > 2
+    d.rectangle([bx, by0, bx + bw, by0 + (83 if tight else 78)], outline=FAINT, width=1)
+    d.rectangle([bx + 1, by0 + 1, bx + bw - 1, by0 + 30], fill=card["fill"])
     bf = banner_font(card["banner"], bw - 14)
-    text(d, (bx + 7, 534), card["banner"], bf, WHITE)
-    para(d, card["head"], F(SANS, 13), bx + 7, 567, bw - 14, 15, INK, max_lines=3)
-    text(d, (bx + 7, 626), card["source"], F(MICRO, 9), MUTED)
+    text(d, (bx + 7, by0 + 4), card["banner"], bf, WHITE)
+    if tight:
+        para(d, card["head"], bodyf, bx + 7, by0 + 29, bw - 14, 12, INK, max_lines=3)
+        text(d, (bx + 7, by0 + 68), card["source"], F(MICRO, 12), MUTED)
+    else:
+        para(d, card["head"], bodyf, bx + 7, by0 + 34, bw - 14, 14, INK, max_lines=3)
+        text(d, (bx + 7, by0 + 64), card["source"], F(MICRO, 12), MUTED)
 
 # where it happened / also on Friday
-rule(d, M, 652, W - M, 652, 1, INK)
-text(d, (M, 657), "WHERE IT HAPPENED", F(HEADB, 12), RED)
-text(d, (W - M, 658), f"ALSO ON FRIDAY 20 NOVEMBER \u2014 {len(MORE)} MORE STORIES", F(SMALL, 11), MUTED, anchor="rt")
+rule(d, M, 690, W - M, 690, 1, INK)
+text(d, (M, 695), "WHERE IT HAPPENED", F(HEADB, 12), RED)
+text(d, (W - M, 696), f"ALSO ON FRIDAY 20 NOVEMBER \u2014 {len(MORE)} MORE STORIES", F(SMALL, 12), MUTED, anchor="rt")
 
-draw_map(d, M, 676, 268, 188)
+draw_map(d, M, 714, 216, 152)
 
-lx0 = M + 282
+lx0 = M + 232
 listw = (W - M - lx0 - 2 * 12) / 3
 for i, (head, src, _) in enumerate(MORE):
-    col, row = divmod(i, 8)
+    col, row = divmod(i, 9)
     bx = lx0 + col * (listw + 12)
-    by = 678 + row * 23
-    text(d, (bx, by), f"{i+1:02d}", F(HEADB, 15), RED)
-    sf = F(MICRO, 10)
+    by = 715 + row * 17
+    text(d, (bx, by), f"{i+1:02d}", F(HEADB, 13), RED)
+    sf = F(MICRO, 12)
     sw = sf.getlength(src) + 6
-    text(d, (bx + listw, by + 3), src, sf, MUTED, anchor="rt")
-    text(d, (bx + 27, by), fit(head, F(SMALL, 16), listw - 29 - sw), F(SMALL, 16), INK)
+    text(d, (bx + listw, by + 2), src, sf, MUTED, anchor="rt")
+    text(d, (bx + 25, by), fit(head, F(SMALL, 16), listw - 27 - sw), F(SMALL, 16), INK)
 
 # date check
-d.rectangle([M, 876, W - M, 958], fill=TINT)
-d.rectangle([M, 876, M + 5, 958], fill=RED)
-text(d, (M + 14, 882), "DATE CHECK \u2014 LEFT OUT: THURSDAY 19 NOVEMBER", F(HEADB, 15), RED)
-text(d, (W - M - 10, 884), "NOT FRIDAY'S NEWS", F(SMALL, 11), MUTED, anchor="rt")
-para(d, DATE_CHECK, F(SANS, 13), M + 14, 903, CW - 28, 15, INK, max_lines=4)
+d.rectangle([M, 872, W - M, 960], fill=TINT)
+d.rectangle([M, 872, M + 5, 960], fill=RED)
+text(d, (M + 14, 877), "DATE CHECK \u2014 NOT FRIDAY 20 NOVEMBER NEWS", F(HEADB, 15), RED)
+text(d, (W - M - 10, 879), "THURSDAY / WEDNESDAY", F(SMALL, 12), MUTED, anchor="rt")
+para(d, DATE_CHECK, F(SANS, 13), M + 14, 898, CW - 28, 14, INK, max_lines=4)
 
 # footer
 rule(d, M, 968, W - M, 968, 1, INK)
-para(d, SOURCES, F(SANS, 12), M, 973, CW - 110, 14, MUTED, max_lines=2)
-text(d, (W - M, 974), "PAGE 1 / 1", F(SMALL, 10), MUTED, anchor="rt")
+para(d, SOURCES, F(SANS, 12), M, 972, CW - 110, 14, MUTED, max_lines=3)
+text(d, (W - M, 974), "PAGE 1 / 1", F(SMALL, 12), MUTED, anchor="rt")
 
 # out-of-bounds audit
 warn = 0
@@ -460,7 +480,7 @@ out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "entry.png"
 img.save(out, "PNG", optimize=True, compress_level=9)
 print("saved", out, os.path.getsize(out), "bytes", img.size)
 
-prev_dir = "/tmp/news-top30"
+prev_dir = "/tmp/news-follow"
 os.makedirs(prev_dir, exist_ok=True)
 small = img.resize((300, 300), Image.LANCZOS)
 small.save(os.path.join(prev_dir, "entry-300.png"), "PNG")
